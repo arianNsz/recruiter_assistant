@@ -1,22 +1,21 @@
 import streamlit as st
 import io
 import pdfplumber
-import pandas as pd
-import openai
-import langchain as lc
-import requests
-
 import google.generativeai as genai
 from openai import OpenAI as oai
 
 from langchain_core.prompts import PromptTemplate
 import json
 
+oai_key = "sk-proj-ECVgRtY8BVwOuJXGvmumT3BlbkFJBjkKCWcGOEcL6iZmZZCJ"
+gemini_key = "AIzaSyDaRClsiV6BXWsxPoQCfHkb6dBcqhl1wl8"
 oai_client = oai(organization="org-23ODEGJjNISztb1VgiYQhhlL", api_key=oai_key)
 genai.configure(api_key=gemini_key)
 
+from streamlit_star_rating import st_star_rating
+
 resume_prompt_template = PromptTemplate.from_template(
-"""
+    """
 The text of a resume will be provided and you will extract some formatted information from it.
 
 before I list the required fields please consider the following hints that might help you in extracting the information:
@@ -58,7 +57,7 @@ your response:
 )
 
 job_prompt_template = PromptTemplate.from_template(
-"""
+    """
 given the job description below extract the following information in a JSON format:
 
 job title:
@@ -87,7 +86,7 @@ your response:
 
 
 comparison_prompt_template = PromptTemplate.from_template(
-""" 
+    """ 
 You are one of the best recruiters in the world, and you should make a decision on whether an applicant should be considered any further or they are not a good fit for the job. 
 You are provided with 2 JSON objects, one is the extracted information from the job description and the other is the extracted information from the resume.
 
@@ -117,9 +116,11 @@ resume info:
 -----
 your response:
 
-""")
+"""
+)
 
-MAX_RETRY=3
+MAX_RETRY = 3
+
 
 def get_response(prompt):
     response = oai_client.chat.completions.create(
@@ -128,30 +129,130 @@ def get_response(prompt):
         response_format={"type": "json_object"},
         temperature=0,
     )
-    return response
+    return response.choices[0].message.content
 
 
-st.title("Recruiter Assistant!")
-st.write("This DEMO app will help you to find the best candidates for your job description!")
-st.write("Simply enter the job description below and upload the resume you have and hand and get a quick rating!")
+def check_length():
+    text = st.session_state["job_description"]
+    if len(text) < 300:
+        st.warning(
+            "Job description is too short! Please provide a detailed description which is at least 300 characters.",
+            icon="⚠️",
+        )
 
-uploaded_resume = st.file_uploader(
-    "Upload the resume in pdf format.", accept_multiple_files=False, type="pdf"
-)
+
+def analysis(resume: str, job_description: str):
+    with st.status("Analyzing...", expanded=True) as status:
+        comparison_response = None
+
+        st.write("Processing the uploaded resume...")
+        for i in range(MAX_RETRY):
+            try:
+                resume_prompt = resume_prompt_template.format(resume=resume)
+                resume_response = get_response(resume_prompt)
+                print(resume_response)
+                print("---------------------")
+                break
+            except:
+                if i == MAX_RETRY - 1:
+                    st.error(
+                        f"Failed to process the resume after {MAX_RETRY} tries. Please make sure the uploaded pdf is not a scanned document or try again with another file."
+                    )
+        st.write("Analyzing the job description...")
+        for i in range(MAX_RETRY):
+            try:
+                job_prompt = job_prompt_template.format(
+                    job_description=job_description
+                )
+                jd_response = get_response(job_prompt)
+                print(jd_response)
+                print("---------------------")
+                break
+            except:
+                if i == MAX_RETRY - 1:
+                    st.error(
+                        f"Failed to process the job description after {MAX_RETRY} tries. Make sure it is English or maybe change it slightly and try again."
+                    )
+        st.write("Comparing applicants qualifications with the job description...")
+        for i in range(MAX_RETRY):
+            try:
+                comparison_prompt = comparison_prompt_template.format(
+                    jd_json=jd_response,
+                    resume_json=resume_response,
+                )
+                print(comparison_prompt)
+                comparison_response = get_response(comparison_prompt)
+                print(comparison_response)
+                print("---------------------")
+                break
+            except:
+                if i == MAX_RETRY - 1:
+                    st.error(
+                        f"Failed to compare the documents after {MAX_RETRY} tries. Please make some changes to the inputs and try again."
+                    )
+            status.update(label="Analysis complete!", state="complete", expanded=False)
+        return comparison_response
 
 
-if uploaded_resumes:
-    bytes_data = uploaded_resumes.getvalue()
-    resume=""
-    with pdfplumber.open(io.BytesIO(bytes_data)) as pdf:
-        text = ""
-        if len(pdf.pages)<2:
-            resume = pdf.pages[0].extract_text()
-        else:
-            for i in range(2):
-                resume += "\n" + pdf.pages[i].extract_text()
-resume_prompt = resume_prompt_template.format(resume=resume)    
+def process_button_clicked(resume, job_description):
+    if not resume or len(job_description) < 300:
+        st.error(
+            "Please ensure a resume is uploaded and the job description is at least 300 characters long."
+        )
+    else:
+        return analysis(resume, job_description)
 
-job_description = st.text_area("Enter the job description here:")
 
-clicked = st.button(label="Process")
+def main():
+    st.title("Recruiter Assistant!")
+    st.markdown(
+        "This **DEMO** app will help you to find the best candidates for your job description!"
+    )
+    st.write(
+        "Simply enter the job description below and upload the resume you have at hand and get a quick rating and recommendation!"
+    )
+
+
+    job_description = st.text_area(
+        label="Job Description",
+        key="job_description",
+        placeholder="The job description must be at least 300 characters. Please inlcude the job title.",
+        on_change=check_length,
+        height = 400
+    )
+
+
+    uploaded_resume = st.file_uploader(
+        "Upload the resume in pdf format.", accept_multiple_files=False, type="pdf"
+    )
+
+    if uploaded_resume:
+        bytes_data = uploaded_resume.getvalue()
+        resume = ""
+        with pdfplumber.open(io.BytesIO(bytes_data)) as pdf:
+            if len(pdf.pages) < 2:
+                resume = pdf.pages[0].extract_text()
+            else:
+                for i in range(2):
+                    resume += "\n" + pdf.pages[i].extract_text()
+
+
+    clicked = st.button(label="Process", type="primary")
+    results = None
+    if clicked:
+        results = process_button_clicked(resume, job_description)
+
+    if results:
+        results = json.loads(results)
+        if results['is_arian_naseh'] in (True, "True", "true"):
+            st.markdown("### Well, of course I'd recommend Arian!🤩🌟 \n### He has built this tool you're using!🤓 \n### I do recommend sending him a follow up email!📧🤙")
+            st.markdown("#### But since we are professionals, here is our regular analysis:")
+        st_star_rating(label = "Match Rating", maxValue = 5, defaultValue = results['score'], key = "match_rating", read_only = True )
+        st.markdown(f"#### Our recommendation: \n {results['label']}")
+        st.markdown(f"#### What we noted: \n {results['notes']}")
+
+
+
+
+if __name__ == "__main__":
+    main()
