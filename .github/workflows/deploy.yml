@@ -29,4 +29,12 @@ jobs:
       OAI_KEY: ${{ secrets.OAI_KEY }}
       GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
     run: |
-    
+      heroku config:set ORG_ID=${ORG_ID}
+      heroku config:set OAI_KEY=${OAI_KEY}
+      heroku config:set GEMINI_KEY=${GEMINI_KEY}
+      git push heroku master
+
+  - name: Run Streamlit
+    run: |
+      streamlit run app.py
+
