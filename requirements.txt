@@ -1,0 +1,10 @@
+openai==1.26.0
+google-generativeai==0.5.4
+langchain==0.1.17
+langchain-community==0.0.37
+langchain-core==0.1.52
+pdfplumber==0.11.0
+pypdf==4.2.0
+st-star-rating==0.0.6
+streamlit==1.35.0
+pandas==2.2.2
