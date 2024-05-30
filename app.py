@@ -2,12 +2,15 @@ import streamlit as st
 import io
 import pdfplumber
 from openai import OpenAI as oai
-
+from dotenv import load_dotenv
+import os
 from langchain_core.prompts import PromptTemplate
 import json
 
-
-oai_client = oai()
+load_dotenv()
+org_id = os.getenv("ORG_ID")
+oai_key = os.getenv("OAI_KEY")
+oai_client = oai(api_key=oai_key, organization=org_id)
 
 from streamlit_star_rating import st_star_rating
 
