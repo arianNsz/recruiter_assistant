@@ -7,9 +7,10 @@ from openai import OpenAI as oai
 from langchain_core.prompts import PromptTemplate
 import json
 
-oai_key = "sk-proj-ECVgRtY8BVwOuJXGvmumT3BlbkFJBjkKCWcGOEcL6iZmZZCJ"
-gemini_key = "AIzaSyDaRClsiV6BXWsxPoQCfHkb6dBcqhl1wl8"
-oai_client = oai(organization="org-23ODEGJjNISztb1VgiYQhhlL", api_key=oai_key)
+org_id=""
+oai_key=""
+gemini_key=""
+oai_client = oai(organization=org_id, api_key=oai_key)
 genai.configure(api_key=gemini_key)
 
 from streamlit_star_rating import st_star_rating
