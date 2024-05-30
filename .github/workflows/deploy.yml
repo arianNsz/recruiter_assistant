@@ -1,0 +1,32 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+  runs-on: ubuntu-latest
+
+  steps:
+  - name: Checkout repository
+    uses: actions/checkout@v2
+
+  - name: Set up python
+    uses: actions/setup-python@v2
+    with:
+      python-version: '3.10'
+
+  - name: Install dependencies
+    run: |
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+
+  - name: Heroku Deployment
+    env:
+      ORG_ID: ${{ secrets.ORG_ID }}
+      OAI_KEY: ${{ secrets.OAI_KEY }}
+      GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
+    run: |
+    

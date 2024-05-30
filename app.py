@@ -1,17 +1,13 @@
 import streamlit as st
 import io
 import pdfplumber
-import google.generativeai as genai
 from openai import OpenAI as oai
 
 from langchain_core.prompts import PromptTemplate
 import json
 
-org_id=""
-oai_key=""
-gemini_key=""
-oai_client = oai(organization=org_id, api_key=oai_key)
-genai.configure(api_key=gemini_key)
+
+oai_client = oai()
 
 from streamlit_star_rating import st_star_rating
 
