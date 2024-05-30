@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_star_rating import st_star_rating
 import io
 import pdfplumber
 from openai import OpenAI as oai
@@ -12,7 +13,6 @@ org_id = os.getenv("ORG_ID")
 oai_key = os.getenv("OAI_KEY")
 oai_client = oai(api_key=oai_key, organization=org_id)
 
-from streamlit_star_rating import st_star_rating
 
 resume_prompt_template = PromptTemplate.from_template(
     """
@@ -66,7 +66,7 @@ your response:
 )
 
 job_prompt_template = PromptTemplate.from_template(
-"""
+    """
 You are one of the best recruiters in the world. You are provided with a job description and you are expected to analyze it and extract some formatted information from it.
 In your response you should also include a note in which you:
     - write your interpretation of the job description and what you think the company is looking for in a candidate.
@@ -206,9 +206,7 @@ def analysis(resume: str, job_description: str):
         st.write("Analyzing the job description...")
         for i in range(MAX_RETRY):
             try:
-                job_prompt = job_prompt_template.format(
-                    job_description=job_description
-                )
+                job_prompt = job_prompt_template.format(job_description=job_description)
                 jd_response = get_response(job_prompt)
                 print(jd_response)
                 print("---------------------")
@@ -257,15 +255,13 @@ def main():
         "Simply enter the job description below and upload the resume you have at hand and get a quick rating and recommendation!"
     )
 
-
     job_description = st.text_area(
         label="Job Description",
         key="job_description",
         placeholder="The job description must be at least 300 characters. Please inlcude the job title.",
         on_change=check_length,
-        height = 320
+        height=320,
     )
-
 
     uploaded_resume = st.file_uploader(
         "Upload the resume in pdf format.", accept_multiple_files=False, type="pdf"
@@ -281,7 +277,6 @@ def main():
                 for i in range(2):
                     resume += "\n" + pdf.pages[i].extract_text()
 
-
     clicked = st.button(label="Process", type="primary")
     results = None
     if clicked:
@@ -289,15 +284,23 @@ def main():
 
         if results:
             results = json.loads(results)
-            if results['is_arian_naseh'] in (True, "True", "true"):
-                st.markdown("#### Well, of course I'd recommend Arian!🤩🌟 \n#### He has built this tool you're using!🤓")
-                st.markdown("#### But since we are professionals, here is our regular analysis:")
-            
-            st_star_rating(label = "Match Rating", maxValue = 5, defaultValue = results['score'], key = "match_rating", read_only = True )
+            if results["is_arian_naseh"] in (True, "True", "true"):
+                st.markdown(
+                    "#### Well, of course I'd recommend Arian!🤩🌟 \n#### He has built this tool you're using!🤓"
+                )
+                st.markdown(
+                    "#### But since we are professionals, here is our regular analysis:"
+                )
+
+            st_star_rating(
+                label="Match Rating",
+                maxValue=5,
+                defaultValue=results["score"],
+                key="match_rating",
+                read_only=True,
+            )
             st.markdown(f"#### Our recommendation: \n {results['label']}")
             st.markdown(f"#### What we noted: \n {results['notes']}")
-
-
 
 
 if __name__ == "__main__":
