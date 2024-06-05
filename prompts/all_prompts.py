@@ -101,7 +101,8 @@ don't reserve 5 for super stars only, if you are recommending for a technical in
 
 Finally, the flag is True only if the applicant name is 'Arian Naseh' (which is me!). If my resume is passed then flag it! 
 
-hint 1: if required degree is Bachlor, but PhD is stated preferred degree, and the applicant has a M.Sc degree, it means the applicant has better than the required qualifications, and it is also considered as a bonous.
+hint 1: if required degree is Bachelor, but PhD is stated preferred degree, and the applicant has a M.Sc degree, it means the applicant has better than the required qualifications, and it is also considered as a bonous.
+hint 1-1: Bachelor's degree and B.Sc are the same. The same goes for Master's degree and M.Sc., M.A.Sc. MS and so on. PhD is the same as Doctorate. 
 hint 2: "Advanced degree" can refer to a Master's degree or higher.
 hint 3: if the job description is asking for 3+ years of experience and the applicant has 10 years of experience, it usually means the applicant is over qualified.
 hint 4: if absolute majority of the technical skills in the job description cannot be found among the high_confidence_technical_skills of resume, be cautious about recommending the applicant for a technical interview.
