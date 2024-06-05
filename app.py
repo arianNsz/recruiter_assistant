@@ -122,22 +122,22 @@ def process_button_clicked(resume, job_description):
 def main():
     st.title("Recruiter Assistant!")
     st.markdown(
-        "This **DEMO** app will help you to find the best candidates for your job description!"
+        "This <u>**demo**</u> app will help you find the best candidates for your job description!"
     )
     st.write(
-        "Simply enter the job description below and upload the resume you have at hand and get a quick rating and recommendation!"
+        "Simply enter the job description below, upload the resume you have on hand, and get a quick rating and recommendation!"
     )
 
     job_description = st.text_area(
         label="Job Description",
         key="job_description",
-        placeholder="The job description must be at least 300 characters. Please inlcude the job title.",
+        placeholder="The job description must be at least 300 characters. Please include the job title.",
         on_change=check_length,
         height=320,
     )
 
     uploaded_resume = st.file_uploader(
-        "Upload the resume in pdf format.", accept_multiple_files=False, type="pdf"
+        "Upload the resume in PDF format.", accept_multiple_files=False, type="pdf"
     )
 
     if uploaded_resume:
@@ -159,7 +159,7 @@ def main():
             results = json.loads(results)
             if results["is_arian_naseh"] in (True, "True", "true"):
                 st.markdown(
-                    "#### Well, of course I'd recommend Arian!🤩🌟 \n#### He has built this tool you're using!🤓"
+                    "#### Well, of course, I'd recommend Arian!!🤩🌟 \n#### He built this tool you're using!!🤓"
                 )
                 st.markdown(
                     "#### But since we are professionals, here is our regular analysis:"
