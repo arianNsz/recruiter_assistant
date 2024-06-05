@@ -122,7 +122,7 @@ def process_button_clicked(resume, job_description):
 def main():
     st.title("Recruiter Assistant!")
     st.markdown(
-        "This <u>**demo**</u> app will help you find the best candidates for your job description!"
+        "This ⚠️ **demo** ⚠️ app will help you find the best candidates for your job description!"
     )
     st.write(
         "Simply enter the job description below, upload the resume you have on hand, and get a quick rating and recommendation!"
