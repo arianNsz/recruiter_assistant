@@ -8,3 +8,4 @@ pypdf==4.2.0
 st-star-rating==0.0.6
 streamlit==1.35.0
 pandas==2.2.2
+python-dotenv==1.0.1
